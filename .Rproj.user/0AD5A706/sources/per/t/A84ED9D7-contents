@@ -1,0 +1,145 @@
+#Project Description
+
+
+
+
+#0. Packages
+#Install if not installed
+packages <- c(
+  "tidyverse",
+  "sf",
+  "terra",
+  "tidygeocoder",
+  "geodata",
+  "osmdata",
+  "exactextractr",
+  "tmap",
+  "fixest",
+  "readxl"
+)
+# Install packages not yet installed
+installed_packages <- packages %in% rownames(installed.packages())
+if (any(installed_packages == FALSE)) {
+  install.packages(packages[!installed_packages])
+}
+
+# Packages loading
+invisible(lapply(packages, library, character.only = TRUE))
+
+#1. Loading the Datasets
+
+#Active Turkey Industrial Zone names and addresses
+osb <-read_excel("firms.xlsx")
+score <-read_excel("socioeconomic_scores_district_2023.xls")
+
+#2. Cleaning the data
+#OSB - INDUSTRIAL ZONE FILE
+#Clean the special characters in turkish language 
+fix_turkish <- function(x) {
+  x <- gsub("ş", "s", x)
+  x <- gsub("Ş", "S", x)
+  x <- gsub("ı", "i", x)
+  x <- gsub("İ", "I", x)
+  x <- gsub("ğ", "g", x)
+  x <- gsub("Ğ", "G", x)
+  x <- gsub("ü", "u", x)
+  x <- gsub("Ü", "U", x)
+  x <- gsub("ö", "o", x)
+  x <- gsub("Ö", "O", x)
+  x <- gsub("ç", "c", x)
+  x <- gsub("Ç", "C", x)
+  x
+}
+
+# Apply to column names
+osb <- osb %>%
+  rename_with(~ fix_turkish(.) %>% tolower() %>% gsub(" ", "_", .))
+
+# Rename the column names for ease and for understanding the english equivalent
+colnames(osb)
+osb <- osb %>% rename(
+  id        = `#`,
+  province  = osb_ili,
+  zone_name      = osb_unvani,
+  phone     = telefon,
+  status    = fiili_durumu,
+  email     = `e-posta`,
+  website   = web_adresi,
+  address   = iletisim_adresi
+)
+
+# Apply to all character columns
+osb <- osb %>%
+  mutate(across(where(is.character), fix_turkish))
+
+#Checking unique zone names in the dataset
+length(unique(osb$zone_name))
+length(osb$zone_name)
+#Each is unique - moving on
+
+
+#score - the socioeconomic score file 
+
+
+
+
+
+
+#3. Geocoding
+head(osb)
+osb_geocoded <- osb %>%
+  mutate(query = paste(zone_name, "Organize Sanayi Bolgesi", province, "Turkey")) %>%
+  geocode(query, method = "osm", lat = lat, lon = lon)
+
+
+sum(!is.na(osb_geocoded$lat))
+
+#only taking those that were matched by their zone names for time constraint for this project.
+osb_geocoded <- osb_geocoded %>% filter(!is.na(lat))
+
+#checking to see if those that matched have decent geographic coverage
+osb_geocoded %>% 
+  count(province) %>% 
+  arrange(desc(n))
+#54/81 provinces. moving on
+
+#turning it into sf
+osb_sf <- osb_geocoded %>%
+  st_as_sf(coords = c("lon", "lat"), crs = 4326)
+
+# download turkey boundary with level 2 = district.
+turkey_district <- gadm(country = "TUR", level = 2, path = tempdir()) %>% 
+  st_as_sf()
+
+# map the industrial zones
+ggplot() +
+  geom_sf(data = turkey_district, fill = "grey95", color = "grey70", linewidth = 0.3) +
+  geom_sf(data = osb_sf, color = "red", size = 1.5, alpha = 0.7) +
+  theme_minimal() +
+  labs(title = "Organized Industrial Zones in Turkey - District Level",
+       subtitle = "114 zones geocoded via OSM",
+       caption = "Source: OSBÜK, OpenStreetMap")
+
+# spatial join zones to districts
+osb_sf <- osb_sf %>%
+  st_join(turkey_district %>% select(NAME_1, NAME_2))
+
+district_with_zones <- turkey_district %>%
+  st_join(osb_sf %>% select(zone_name)) %>%
+  st_drop_geometry() %>%
+  filter(!is.na(zone_name)) %>%
+  distinct(GID_2) %>%
+  pull(GID_2)
+
+zone_district <- turkey_district %>%
+  filter(GID_2 %in% district_with_zones)
+
+non_zone_district <- turkey_district %>%
+  filter(NAME_1 %in% zone_district$NAME_1,
+         !GID_2 %in% district_with_zones)
+
+
+
+
+
+ 

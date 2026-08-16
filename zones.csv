@@ -1,0 +1,117 @@
+zone_name,province,district_id,lat,lon,est_year_clean,year_flag,dist_road_km,website_url,source_url
+Adana Haci Sabanci,Adana,TUR.1.13_1,36.9688054,35.5939917,1973,ok,0.2664682582529125,https://www.adanaorganize.org.tr,https://www.adanaorganize.org.tr/hakkimizda
+Adiyaman,Adiyaman,TUR.2.6_1,37.7716866,38.211781,2001,ok,3.541508077307931,https://www.adiyamanosb.org.tr,https://www.adiyamanosb.org.tr
+Afyonkarahisar,Afyonkarahisar,TUR.3.14_1,38.7970713,30.5572218,1980,ok,1.3020443445428074,https://www.afyonosb.org.tr,https://www.afyonosb.org.tr
+Suhut,Afyonkarahisar,TUR.3.17_1,38.6052425,30.5840876,,ok,12.090844857060317,https://www.suhutosb.org.tr,
+Aksaray,Aksaray,TUR.5.5_1,38.2727096,34.0107843,2000,ok,1.7459085849741034,https://www.aksarayosb.org.tr,https://www.aksarayosb.org.tr
+Amasya,Amasya,TUR.6.4_1,40.5837427,35.6399973,1993,ok,8.148408773357247,https://www.amasyaosb.org.tr,https://www.amasyaosb.org.tr
+Suluova,Amasya,TUR.6.5_1,40.8619396,35.6100507,2007,ok,0.46366131566812385,https://www.suluovaosb.org.tr,https://www.suluovaosb.org.tr
+Suluova Besi,Amasya,TUR.6.6_1,40.7900014,35.6589677,,ok,1.1643029398376208,https://www.suluovabesiosb.org.tr,
+Anadolu,Ankara,TUR.7.21_1,39.7990004,32.414486,2012,ok,5.535333724239909,https://www.anadoluosb.org.tr,https://www.anadoluosb.org.tr/hakkimizda
+Ankara Uzay ve Havacilik Ihtisas,Ankara,TUR.7.16_1,40.0609927,32.5897089,,ok,0.06747407780633184,https://www.hab.org.tr,
+Ankara-Ivedik,Ankara,TUR.7.24_1,39.9889931,32.7300605,2000,ok,2.258689391513972,https://www.ivedikosb.org.tr,https://www.ivedikosb.org.tr
+Baskent,Ankara,TUR.7.21_1,39.803167,32.3796344,2003,ok,7.1625604352998185,https://www.baskentosb.org,https://www.baskentosb.org
+Elmadag Mobilyacilar Ihtisas,Ankara,TUR.7.9_1,39.9331579,33.2911376,,excluded - predates first Turkish OSB (1961),0.481896418525983,https://www.mobilyacilarosb.com,https://www.mobilyacilarosb.com/hakkimizda
+Ostim,Ankara,TUR.7.24_1,39.9676735,32.7499197,1967,ok,2.508937163746744,https://www.ostim.org.tr,https://www.ostim.org.tr
+Sereflikochisar,Ankara,TUR.7.23_1,38.9145736,33.6017899,,ok,2.258611929856342,https://www.sereflikochisarosb.org.tr,
+Antalya,Antalya,TUR.8.14_1,37.0757536,30.6201484,,ok,0.2743291702065453,https://www.antalyaosb.org.tr,
+Aydin,Aydin,TUR.11.13_1,37.8641228,27.9812017,1980,ok,0.9796629889132166,https://www.aydinosb.org.tr,https://www.aydinosb.org.tr/hakkimizda
+Soke,Aydin,TUR.11.15_1,37.7376975,27.4074117,1996,ok,0.13417514268890796,https://www.sokeosb.org.tr,https://www.sokeosb.org.tr/hakkimizda
+Balikesir,Balikesir,TUR.12.16_1,39.5813149,27.8411084,,ok,2.115366594958153,https://www.balosb.org.tr,
+Bayburt,Bayburt,TUR.15.3_1,40.2814901,40.1561516,,ok,0.5273488398370134,https://www.bayburtosb.org.tr,
+Bingol,Bingol,TUR.17.5_1,38.8079125,40.5283945,,ok,1.7585299908426661,https://www.bingolosb.org.tr,
+Bitlis,Bitlis,TUR.18.7_1,38.4927681,42.1748457,2000,ok,0.3936432941860969,https://www.bitlisosb.org.tr,https://www.bitlisosb.org.tr
+Bursa,Bursa,TUR.21.12_1,40.2400028,28.9587221,,ok,0.7527644425785042,https://www.bosb.org.tr,
+Bursa Deri Ihtisas ve Karma,Bursa,TUR.21.12_1,40.2467592,28.6728769,,ok,1.622115524213382,https://www.bursaderiosb.com,
+Demirtas,Bursa,TUR.21.12_1,40.2696207,29.068259,2011,ok,0.9661871693094045,https://www.dosab.org.tr,https://www.dosab.org.tr
+Hasanaga,Bursa,TUR.21.12_1,40.1758742,28.7822769,,ok,4.117008512079303,https://www.hosab.org.tr,
+Inegol,Bursa,TUR.21.5_1,40.1586918,29.5454836,2012,ok,3.30215352191331,https://www.inegolosb.org.tr,https://www.inegolosb.org.tr
+Kayapa,Bursa,TUR.21.12_1,40.1804504,28.8253486,,ok,4.105050861174644,https://www.kayapaosb.org.tr,
+Kestel,Bursa,TUR.21.9_1,40.194986,29.1990192,2004,ok,0.38388744467752156,https://www.kosab.org.tr,https://www.kosab.org.tr
+Mustafakemalpasa,Bursa,TUR.21.11_1,40.0065944,28.309126,2015,ok,2.521825077784299,https://www.mkposb.org.tr,https://www.mkposb.org.tr
+Nilufer,Bursa,TUR.21.12_1,40.2374552,28.9344533,,ok,2.401161190551196,https://www.nosab.org.tr,
+Uludag,Bursa,TUR.21.9_1,40.2052673,29.1938619,,ok,0.6961224770631218,https://www.uludagosb.org.tr,
+Yenice,Bursa,TUR.21.9_1,40.2080525,29.2116545,,ok,0.16539390323636455,https://www.yeniceosb.org.tr,
+Biga,Canakkale,TUR.22.3_1,40.3257696,27.0761901,,ok,0.7224793536610609,https://www.bigaosb.org.tr,
+Canakkale,Canakkale,TUR.22.11_1,40.1567022,26.4680691,1997,ok,0.5329792745829081,https://www.canakkaleosb.org,https://www.canakkaleosb.org
+Cankiri Yakinkent,Cankiri,TUR.23.9_1,40.3801673,33.5098394,2012,ok,1.7021612688918206,https://www.cankiriyakinkentosb.org,https://www.cankiriyakinkentosb.org
+Corum,Corum,TUR.24.9_1,40.4818611,34.8599615,1977,ok,1.7931671774560416,https://www.corumosb.org.tr,https://www.corumosb.org.tr/kurumsal
+Osmancik,Corum,TUR.24.12_1,41.0006977,34.7712792,2014,ok,2.029728016084317,https://www.osmancikosb.org.tr,https://www.osmancikosb.org.tr
+Denizli,Denizli,TUR.25.14_1,37.8042476,29.2497132,2015,ok,0.5529202530602744,https://www.dosb.org.tr,https://www.dosb.org.tr
+Diyarbakir,Diyarbakir,TUR.26.13_1,38.0709253,40.0353349,,ok,0.8239315319453474,https://www.diyarbakirosb.org.tr,
+Duzce,Duzce,TUR.27.6_1,40.7860602,31.1422531,,ok,2.390129906259305,https://www.duzceosb.org.tr,
+Edirne,Edirne,TUR.28.8_1,41.8296623,26.8331388,,ok,20.358311550855294,https://www.edirneosb.org.tr,
+Erzincan,Erzincan,TUR.30.5_1,39.7545058,39.3982514,2011,ok,1.1802922868999897,https://www.erzincanosb.com,https://www.erzincanosb.com/hakkimizda
+Eskisehir,Eskisehir,TUR.32.8_1,39.7318136,30.6414279,,ok,0.42582276373037115,https://www.eosb.org.tr,
+Gaziantep,Gaziantep,TUR.33.8_1,37.1463342,37.2947515,2007,ok,3.1066252243560855e-6,https://www.gaosb.org,https://www.gaosb.org
+Giresun,Giresun,TUR.34.11_1,40.9094588,38.4276825,,ok,0.30514294866452657,https://www.giresunosb.com,
+Iskenderun,Hatay,TUR.37.3_1,36.6880564,36.2094425,2000,ok,0.010661426697238102,https://www.iskenderunosb.org.tr,https://www.iskenderunosb.org.tr
+Beylikduzu,Istanbul,TUR.40.12_1,40.9969618,28.6614121,2002,ok,1.0993363880704723,https://www.ibosb.com,https://www.ibosb.com
+Birlik,Istanbul,TUR.52.2_1,40.877156,29.389203,2007,ok,0.11337713712850896,https://www.birlikosb.org.tr,https://www.birlikosb.org.tr
+Istanbul Deri,Istanbul,TUR.52.2_1,40.8785475,29.3623736,1982,ok,1.3771416775471244,https://www.ideriosb.org.tr,https://www.ideriosb.org.tr
+Istanbul Dudullu,Istanbul,TUR.40.3_1,40.9976122,29.1725812,1977,ok,0.5590488034966485,https://www.dudulluosb.org.tr,https://www.dudulluosb.org.tr/hakkimizda
+Istanbul Ikitelli,Istanbul,TUR.40.8_1,41.0648375,28.7839082,1985,ok,0.17555972070605766,https://www.iosb.org.tr,https://www.iosb.org.tr/hakkimizda
+Istanbul Tuzla,Istanbul,TUR.52.2_1,40.88273,29.4088555,2000,ok,1.6925808374745266,https://www.itosb.org.tr,https://www.itosb.org.tr/hakkimizda
+Istanbul Tuzla Kimya Sanayicileri,Istanbul,TUR.52.2_1,40.883363,29.3963681,1986,ok,1.0266190037240266,https://www.kosb.com.tr,https://www.kosb.com.tr
+Bergama,Izmir,TUR.41.4_1,39.0813133,27.0480242,2001,ok,1.318213724920184,https://www.bosbi.org.tr,https://www.bosbi.org.tr/hakkimizda
+Buca Ege,Izmir,TUR.41.6_1,38.3913735,27.1989285,1996,ok,2.666949457147424,https://www.begos.org.tr,https://www.begos.org.tr/tarihce
+ITOB,Izmir,TUR.41.20_1,38.1943778,27.2034956,,ok,5.226538678766126,https://www.itob.org.tr,
+Izmir Ataturk,Izmir,TUR.41.9_1,38.474078,27.0314294,1990,ok,0.7915667402517689,https://www.iaosb.org.tr,https://www.iaosb.org.tr
+Izmir Kemalpasa,Izmir,TUR.41.6_1,38.4656047,27.3512852,2000,ok,0.19397337190779748,https://www.kosbi.org.tr,https://www.kosbi.org.tr
+Kinik,Izmir,TUR.41.17_1,39.0988239,27.4162703,1970,ok,1.0361877214224213,https://www.kinikosb.org.tr,https://www.kinikosb.org.tr
+Odemis,Izmir,TUR.41.26_1,38.1311316,27.6632865,,ok,5.630551782927541,https://www.odemisosb.org.tr,
+Tire,Izmir,TUR.41.26_1,38.121527,27.699,1998,ok,4.114634448366485,https://www.tosbi.org.tr,https://www.tosbi.org.tr
+Kahramanmaras,Kahramanmaras,TUR.42.7_1,37.6002862,36.7684322,,ok,1.3850713115777749,https://www.kmosb.org,
+Karabuk,Karabuk,TUR.43.3_1,41.1363213,32.6374083,1995,ok,2.3343885765989083,https://www.karorsan.org.tr,https://www.karorsan.org.tr
+Karaman,Karaman,TUR.44.5_1,37.2055513,33.3108867,1989,ok,1.7793727540063602,https://www.karamanosb.org.tr,https://www.karamanosb.org.tr
+Kastamonu,Kastamonu,TUR.46.15_1,41.5164669,33.7543166,1993,ok,0.43949147015417883,https://www.kastamonuosb.org.tr,https://www.kastamonuosb.org.tr/hakkimizda
+Kastamonu Seydiler,Kastamonu,TUR.46.18_1,41.6653484,33.7086422,2000,ok,2.819649341631821,https://www.seydilerosb.org.tr,https://www.seydilerosb.org.tr
+Tosya,Kastamonu,TUR.46.20_1,41.0210684,34.1180619,,ok,0.42837334315803954,https://www.tosyaosb.com,
+Kayseri,Kayseri,TUR.47.5_1,38.714934,35.3593492,,ok,2.9518606152988554,https://www.kayseriosb.org,
+Kayseri Mimarsinan,Kayseri,TUR.47.13_1,38.7025695,35.6327344,,ok,2.0351760994721695,https://www.mimarsinanosb.org.tr,
+Buyukkaristiran,Kirklareli,TUR.50.4_1,41.2780621,27.5768233,2014,ok,0.6735253776663355,https://www.buyukkaristiranosb.org.tr,https://www.buyukkaristiranosb.org.tr
+Evrensekiz,Kirklareli,TUR.50.4_1,41.3469895,27.4580097,,ok,0.5845740102648589,https://www.evrensekizosb.org.tr,
+Kirklareli,Kirklareli,TUR.50.5_1,41.6814524,27.333482,,ok,1.4039181320332412,https://www.kirklareliosb.org.tr,
+Kirsehir,Kirsehir,TUR.51.6_1,39.0781665,34.1909188,,ok,1.4483265935459362,https://www.kirsehirosb.gov.tr,
+Kilis,Kilis,TUR.48.2_1,36.7255544,37.2141232,,ok,0.6326453764241492,https://www.kilisosb.org.tr,
+Gebze,Kocaeli,TUR.52.6_1,40.8161406,29.5549259,2015,ok,1.5880100752255721,https://www.gosb.com.tr,https://www.gosb.com.tr
+Kandira Gida Ihtisas,Kocaeli,TUR.52.7_1,40.929191,30.0828447,,ok,0.4890139395574554,https://www.kandiragiosb.org.tr,
+Kocaeli Gebze V(kimya) Ihtisas,Kocaeli,TUR.52.6_1,40.8161406,29.5549259,2000,ok,1.5880100752255721,https://www.gebkim.org.tr,https://www.gebkim.org.tr
+Makine Ihtisas,Kocaeli,TUR.52.2_1,40.8386649,29.5662416,,excluded - predates first Turkish OSB (1961),2.464729708852778,https://www.makineosb.org.tr,https://www.makineosb.org.tr
+Cumra,Konya,TUR.53.9_1,37.6357852,32.702923,2000,ok,0.5166707319976671,https://www.cumraosb.org.tr,https://www.cumraosb.org.tr
+Konya,Konya,TUR.53.26_1,37.9869113,32.6189381,1976,ok,1.8692793991526475,https://www.kos.org.tr,https://www.kos.org.tr
+Seydisehir,Konya,TUR.53.27_1,37.4932627,31.8083353,,ok,0.6303859955136856,https://www.seydisehirosb.org,
+Gediz,Kutahya,TUR.54.7_1,38.9653798,29.3588466,,ok,0.9306096031857294,https://www.gedizosb.org.tr,
+Malatya II.,Malatya,TUR.55.14_1,38.3383623,38.1868574,,ok,1.1323237664528456,https://www.malatyaosb.org.tr,
+Manisa,Manisa,TUR.56.10_1,38.622658,27.3403061,1999,ok,1.4417766315382303,https://www.mosb.org.tr,https://www.mosb.org.tr/kurumsal
+Manisa Turgutlu I.,Manisa,TUR.56.16_1,38.4950745,27.6402147,1996,ok,3.318602775570353e-6,https://www.turgutluosb.org.tr,https://www.turgutluosb.org.tr/hakkimizda
+Muradiye,Manisa,TUR.56.10_1,38.6362878,27.3520673,,ok,0.9427526486987908,https://www.muosb.org.tr,
+Soma,Manisa,TUR.56.15_1,39.2307988,27.5695129,2002,ok,1.7037193728143758,https://www.somaosb.org.tr,https://www.somaosb.org.tr/hakkimizda
+Mardin,Mardin,TUR.57.3_1,37.2744484,40.6676491,,ok,1.2433871334956574,https://www.mardinosb.org.tr,
+Mersin,Mersin,TUR.58.10_1,36.8973484,34.7961974,,ok,2.502625082643591,https://www.mtosb.org.tr,
+Silifke,Mersin,TUR.58.9_1,36.3691588,33.9002559,,ok,0.8789116269472417,https://www.silifkeosb.org.tr,
+Tarsus,Mersin,TUR.58.10_1,36.8973484,34.7961974,,ok,2.502625082643591,https://www.tarsusosb.org.tr,
+Nigde,Nigde,TUR.62.2_1,37.9528303,34.610019200000004,,ok,3.4721075935946164,https://www.nigdeosb.com,
+Nigde Bor Karma ve Deri Ihtisas,Nigde,TUR.62.2_1,37.8662455,34.4718017,,ok,1.1480644904409776,https://www.borosb.org.tr,
+Fatsa,Ordu,TUR.63.5_1,41.0049126,37.5210664,,ok,2.0297300061367842,https://www.fatsaosb.com.tr,
+Osmaniye,Osmaniye,TUR.37.4_1,37.0143801,36.1027982,,ok,1.3664389720460446,https://www.oosb.org.tr,
+Ferizli,Sakarya,TUR.66.2_1,40.9575969,30.5207982,,ok,0.9329486673644318,https://www.ferizliosb.org.tr,
+Carsamba,Samsun,TUR.67.5_1,41.1755309,36.6953345,,ok,3.367991682614653,https://www.carsambaosb.com,
+Samsun Havza,Samsun,TUR.67.6_1,41.0113931,35.8099082,,ok,1.1084826361908413,https://www.havzaosb.org.tr,
+Sinop,Sinop,TUR.70.7_1,41.9305904,35.0738586,,ok,0.8406655171125432,https://www.sinoposb.org.tr,
+Demirag,Sivas,TUR.72.12_1,39.6102962,37.1096748,,ok,6.523049707600337,https://www.demiragosb.org.tr,
+Sanliurfa,Sanliurfa,TUR.68.8_1,37.0959635,38.6534912,,ok,1.2051989200545308,https://www.suosb.org.tr,
+Cerkezkoy,Tekirdag,TUR.73.2_1,41.2981225,27.9720953,,ok,2.1221459866792585,https://www.cosb.org.tr,
+Corlu 1,Tekirdag,TUR.73.2_1,41.1202725,27.8459557,,ok,2.7929401147669224,https://www.corlu1osb.org.tr,
+Ergene-1,Tekirdag,TUR.73.7_1,41.2753532,27.614660400000002,,ok,0.18896355141197926,https://www.ergene1osb.org,
+Ergene-2,Tekirdag,TUR.73.7_1,41.232787,27.6981816,,ok,0.5810855519288323,https://www.ergene2osb.org.tr,
+Kapakli,Tekirdag,TUR.73.2_1,41.2733657,27.9427387,,ok,5.809257197432121,https://www.kapakliosb.org.tr,
+Malkara,Tekirdag,TUR.73.4_1,40.8832235,27.0087004,,ok,1.4188977573459907,https://www.malkaraosb.org.tr,
+Muratli,Tekirdag,TUR.73.7_1,41.1996589,27.5190405,,ok,1.505821815295001,https://www.muratliosb.org,
+Velikoy,Tekirdag,TUR.73.2_1,41.2363859,27.9219337,,ok,1.7187832646706604,https://www.vosb.org.tr,
+Velimese,Tekirdag,TUR.73.2_1,41.2162186,27.8617367,2012,ok,1.890175503486388,https://www.velimeseosb.org.tr,https://www.velimeseosb.org.tr
+Yaliboyu,Tekirdag,TUR.73.2_1,41.2554107,27.8990605,2000,ok,3.305429761923963,https://www.yaliboyuosb.org.tr,https://www.yaliboyuosb.org.tr
+Usak,Usak,TUR.77.4_1,38.705691,29.2160302,,ok,1.1199601766245912e-4,https://www.uosb.org.tr,
+Usak Deri (karma),Usak,TUR.77.4_1,38.6221323,29.4782265,1988,ok,0.8394181849528604,https://www.ukosb.org.tr,https://www.ukosb.org.tr
+Van,Van,TUR.78.9_1,38.5887924,43.3113401,,ok,1.1416778806071906,https://www.vanosb.org.tr,
+Yozgat,Yozgat,TUR.80.14_1,39.6995467,34.6149871,1993,ok,0.6998467850768916,https://www.yozgatosb.org.tr,https://www.yozgatosb.org.tr/tarihce

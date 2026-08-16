@@ -1,0 +1,605 @@
+#project Description
+
+
+
+
+#0.packages
+#Install if not installed
+packages <- c(
+  "tidyverse",
+  "sf",
+  "terra",
+  "tidygeocoder",
+  "geodata",
+  "osmdata",
+  "exactextractr",
+  "tmap",
+  "fixest",
+  "readxl",
+  "blackmarbler",
+  "httr",
+  "rvest",
+  "knitr"
+)
+
+# install packages not yet installed
+installed_packages <- packages %in% rownames(installed.packages())
+if (any(installed_packages == FALSE)) {
+  install.packages(packages[!installed_packages])
+}
+
+# packages loading
+invisible(lapply(packages, library, character.only = TRUE))
+
+#1. loading the datasets
+
+#active Turkey Industrial Zone names and addresses
+osb <-read_excel("firms.xlsx")
+
+#socieconomic scores for each district in turkey, 2023
+score <-read_excel("socioeconomic_scores_district_2023.xls",skip = 4, col_names = TRUE)
+
+#motorways
+if (file.exists("motorways_sf.rds")) {
+  
+  motorways_sf <- readRDS("motorways_sf.rds")
+  
+} else {
+  
+  motorways <- opq(bbox = "Turkey") %>%
+    add_osm_feature(key = "highway", 
+                    value = c("motorway", "trunk")) %>%
+    osmdata_sf()
+  
+  motorways_sf <- motorways$osm_lines %>%
+    st_transform(crs = 4326)
+  
+  saveRDS(motorways_sf, "motorways_sf.rds")
+  
+}
+
+#nightlights
+nlavg2025 <- rast("2025avgnl.tif") 
+
+#2. cleaning the data
+#Clean the special characters in turkish language 
+fix_turkish <- function(x) {
+  x <- gsub("ş", "s", x)
+  x <- gsub("Ş", "S", x)
+  x <- gsub("ı", "i", x)
+  x <- gsub("İ", "I", x)
+  x <- gsub("ğ", "g", x)
+  x <- gsub("Ğ", "G", x)
+  x <- gsub("ü", "u", x)
+  x <- gsub("Ü", "U", x)
+  x <- gsub("ö", "o", x)
+  x <- gsub("Ö", "O", x)
+  x <- gsub("ç", "c", x)
+  x <- gsub("Ç", "C", x)
+  x
+}
+
+#OSB - ZONE DATA
+#source: OSBÜK (Organize Sanayi Bölgeleri Üst Kuruluşu) official registry. copy pasted the table to excel
+#url: https://osbuk.org/view/osb/osbliste.php
+#contains: 297 active OSBs with zone name, province, phone, 
+#           operational status, email, website, and address
+#status: all zones in this dataset are active (ISLETMEDE/FAALIYETTE)
+
+#transform turkish/special characters w the function 
+osb <- osb %>%
+  rename_with(~ fix_turkish(.) %>% tolower() %>% gsub(" ", "_", .))
+
+#rename the zone column names for ease and for understanding the english equivalent
+colnames(osb)
+osb <- osb %>% rename(
+  id        = `#`,
+  province  = osb_ili,
+  zone_name      = osb_unvani,
+  phone     = telefon,
+  status    = fiili_durumu,
+  email     = `e-posta`,
+  website   = web_adresi,
+  address   = iletisim_adresi
+)
+
+# apply to all character columns
+osb <- osb %>%
+  mutate(across(where(is.character), fix_turkish))
+
+#checking unique zone names in the dataset
+length(unique(osb$zone_name))
+length(osb$zone_name)
+#each is unique - moving on
+
+#score - the socioeconomic score file 
+#source: TUIK (Turkish Statistical Institute)
+#url: https://veriportali.tuik.gov.tr/en/press/57942
+#socioeconomic status (ses) is defined as a measure that jointly considers the social and economic status of households. ses is calculated based on the income level, the average years of education, and the information on occupation of the household members. 
+#status is in alphabethic order. a+ group is the highest level and e is the lowest.
+#each component used in the calculation is assigned a score ranging from 0 (lowest) to 100 (highest). the score is computed by taking 50% of the education score, 30% of the income score and 20% of the occupation score.
+#the score ranges from 0 to 300.
+#the a-e columns are the shares of households in that category
+head(score)
+score_clean <- score %>%
+  rename(
+    province   = 1,
+    district   = 2,
+    mean_score = 3,
+    total      = 4,
+    A_plus     = 5,   # Upper level [A and A+]
+    B          = 6,   # Lower-upper level [B]
+    C          = 7,   # Middle level [C1 and C2]
+    D          = 8,   # Lower level [D]
+    E          = 9    # Lowest level [E]
+  ) %>%
+  filter(province != "Toplam-Total") %>%
+  tidyr::fill(province, .direction = "down")
+
+#3. Geocoding
+osb_geocoded <- osb %>%
+  mutate(query = paste(zone_name, "Organize Sanayi Bolgesi", province, "Turkey")) %>%
+  geocode(query, method = "osm", lat = lat, lon = lon)
+
+#only taking those that were matched by their zone names for time constraint for this project - 117 osb from 297.
+osb_geocoded <- osb_geocoded %>% filter(!is.na(lat))
+
+nrow(osb_geocoded)
+#checking to see if those that matched have decent geographic coverage
+osb_geocoded %>% 
+  count(province) %>% 
+  arrange(desc(n))
+#54/81 provinces. moving on
+
+#turning it into sf
+osb_sf <- osb_geocoded %>%
+  st_as_sf(coords = c("lon", "lat"), crs = 4326)
+
+# download turkey boundary with level 2 = district.
+#?geodata::gadm
+turkey_district <- gadm(country = "TUR", level = 2, path = tempdir()) %>% 
+  st_as_sf()
+
+turkey_district <- turkey_district %>%
+  rename(
+    district_id  = GID_2,
+    country_code = GID_0,
+    country_name = COUNTRY,
+    province_id  = GID_1,
+    province     = NAME_1,
+    district     = NAME_2,
+    alt_name     = VARNAME_2,
+    local_type   = TYPE_2,
+    eng_type     = ENGTYPE_2,
+    admin_code   = CC_2,
+    hasc_code    = HASC_2
+  )
+
+#preparing night lights for turkey
+ntl_turkey <- crop(nlavg2025, turkey_district)
+
+# map the industrial zones
+ggplot() +
+  geom_sf(data = turkey_district, fill = "grey95", color = "grey70", linewidth = 0.3) +
+  geom_sf(data = osb_sf, color = "red", size = 1.5, alpha = 0.7) +
+  theme_minimal() +
+  labs(title = "Organized Industrial Zones in Turkey - District Level",
+       subtitle = "114 zones geocoded via OSM",
+       caption = "Source: OSBÜK, OpenStreetMap")
+
+#industrial zones plus roads
+ggplot() +
+  geom_sf(data = turkey_district, 
+          fill = "grey95", color = "grey70", linewidth = 0.3) +
+  geom_sf(data = motorways_sf, 
+          color = "steelblue", linewidth = 0.4, alpha = 0.7) +
+  geom_sf(data = osb_sf, 
+          color = "red", size = 1.5, alpha = 0.8) +
+  theme_minimal() +
+  labs(
+    title    = "Organized Industrial Zones and Major Roads in Turkey",
+    subtitle = "Red = OSB zones | Blue = Motorways and trunk roads",
+    caption  = "Sources: OSBÜK, OpenStreetMap, GADM"
+  )
+
+# spatial join zones to districts 
+osb_sf <- osb_sf %>%
+  st_join(turkey_district %>% select(district))
+
+#st_distance calculates the shortest straight-line distance between two spatial objects.
+#for each zone point it finds the nearest point on any road segment and measures the distance to it
+#dist_road_km answers "this zone is X km from the nearest motorway or trunk road."
+osb_sf <- osb_sf %>%
+  mutate(
+    dist_road_km = as.numeric(
+      st_distance(
+        osb_sf,              # actual zone coordinates
+        st_union(motorways_sf)  # nearest road segment
+      )
+    ) / 1000 #convert meters to km
+  )
+
+# district-level distance (centroid)
+turkey_district <- turkey_district %>%
+  mutate(
+    dist_road_km = as.numeric(
+      st_distance(
+        st_centroid(st_geometry(turkey_district)),
+        st_union(motorways_sf)
+      )
+    ) / 1000
+  )
+
+# extract mean per district
+turkey_district <- turkey_district %>%
+  mutate(mean_ntl_2025 = exact_extract(ntl_turkey, turkey_district, "mean"))
+
+# recreate district_with_zones using new column names
+district_with_zones <- turkey_district %>%
+  st_join(osb_sf %>% select(zone_name)) %>%
+  st_drop_geometry() %>%
+  filter(!is.na(zone_name)) %>%
+  distinct(district_id) %>%
+  pull(district_id)
+
+zone_district <- turkey_district %>%
+  filter(district_id %in% district_with_zones)
+
+non_zone_district <- turkey_district %>%
+  filter(province %in% zone_district$province,
+         !district_id %in% district_with_zones)
+
+length(district_with_zones)  # how many districts have a zone
+nrow(zone_district)           # should match
+nrow(non_zone_district)       # comparison group
+
+
+#adding all the districts that have at least 1 osb in their PROVINCE and the information regarding the night lights and shortest distance to a roadway
+analysis_units <- turkey_district %>%
+  st_drop_geometry() %>%
+  mutate(has_zone = district_id %in% district_with_zones) %>%
+  filter(province %in% zone_district$province) %>%
+  select(district_id, province, district, has_zone,
+         dist_road_km, mean_ntl_2025)
+
+#building a comparison table for zone district vs non-zone district
+comparison_table <- analysis_units %>%
+  group_by(has_zone) %>%
+  summarise(
+    n            = n(),
+    dist_road_km = mean(dist_road_km, na.rm = TRUE),
+    mean_ntl     = mean(mean_ntl_2025, na.rm = TRUE),
+    .groups      = "drop"
+  ) %>%
+  mutate(has_zone = ifelse(has_zone, "Zone District", "Non-Zone District")) %>%
+  rename(
+    `Zone Status`             = has_zone,
+    `N Districts`             = n,
+    `Mean Dist. to Road (km)` = dist_road_km,
+    `Mean Night Lights`       = mean_ntl
+  )
+
+kable(comparison_table, digits = 2)
+
+
+# find districts that share a border with a zone district
+neighboring_ids <- turkey_district %>%
+  st_filter(zone_district, .predicate = st_touches) %>%
+  pull(district_id)
+
+# build analysis units with adjacent non-zone districts only
+analysis_units_adjacent <- turkey_district %>%
+  st_drop_geometry() %>%
+  mutate(has_zone = district_id %in% district_with_zones) %>%
+  filter(
+    district_id %in% district_with_zones |        # zone districts
+      district_id %in% neighboring_ids              # OR adjacent non-zone districts
+  ) %>%
+  select(district_id, province, district, has_zone,
+         dist_road_km, mean_ntl_2025)
+
+#building a comparison table for zone district vs non-zone district with more rigorous specification
+comparison_table_adjacent <- analysis_units_adjacent %>%
+  group_by(has_zone) %>%
+  summarise(
+    n            = n(),
+    dist_road_km = mean(dist_road_km, na.rm = TRUE),
+    mean_ntl     = mean(mean_ntl_2025, na.rm = TRUE),
+    .groups      = "drop"
+  ) %>%
+  mutate(has_zone = ifelse(has_zone, "Zone District", "Non-Zone District")) %>%
+  rename(
+    `Zone Status`             = has_zone,
+    `N Districts`             = n,
+    `Mean Dist. to Road (km)` = dist_road_km,
+    `Mean Night Lights`       = mean_ntl
+  )
+
+kable(comparison_table_adjacent, digits = 2)
+
+# are adjacent non-zone districts more similar to zone districts
+# than all non-zone districts?
+
+# coefficient of variation — lower = more similar groups
+analysis_units %>%
+  group_by(has_zone) %>%
+  summarise(mean_ntl = mean(mean_ntl_2025, na.rm = TRUE),
+            sd_ntl   = sd(mean_ntl_2025, na.rm = TRUE))
+
+analysis_units_adjacent %>%
+  group_by(has_zone) %>%
+  summarise(mean_ntl = mean(mean_ntl_2025, na.rm = TRUE),
+            sd_ntl   = sd(mean_ntl_2025, na.rm = TRUE))
+
+#Web Scraping for establishment years
+
+# Source: Individual OSB websites from OSBÜK registry (osb_sf$website column)
+# The scraper attempts to find founding years in three layers:
+# Layer 1 - Homepage
+#   Fetches the root URL first (e.g. https://www.bosb.org.tr)
+# Layer 2 - Subpage fallback
+#   If no year found on homepage, sequentially tries common Turkish
+#   about/history subpages: /hakkimizda, /tarihce, /kurumsal,
+#   /hakkinda, /biz-kimiz, /tarihcemiz. Stops at first success.
+# Layer 3 - Two-tier year extraction
+#   Priority 1: Lines containing a founding keyword AND a year.
+#               Keywords: kuruluş, kuruldu, faaliyete geçti,
+#               hizmete girdi, yılından bu yana, etc.
+#               These are high-confidence matches.
+#   Priority 2: If no keyword match, takes the earliest year
+#               found anywhere on the page as a fallback.
+# Year range filter: 1950-2015 only.
+#   Excludes recent years (2016+) which are typically news dates,
+#   not founding years.
+# Reliability safeguards:
+#   - encoding = "UTF-8" to correctly parse Turkish characters
+#   - Sys.sleep(1.5) between requests to avoid IP blocking
+#   - tryCatch() so a single failed site does not crash the loop
+#   - source_url recorded for every extracted year for traceability
+
+scrape_est_year <- function(base_url) {
+  Sys.sleep(3)
+  
+  subpages <- c("", "/hakkimizda", "/tarihce", "/kurumsal", 
+                "/hakkinda", "/biz-kimiz", "/tarihcemiz")
+  
+  urls_to_try <- paste0(base_url, subpages)
+  
+  found_year <- NA
+  found_url  <- NA
+  
+  for (url in urls_to_try) {
+    result <- tryCatch({
+      con <- url(url, open = "r")
+      on.exit(try(close(con), silent = TRUE))
+      
+      page  <- read_html(url, encoding = "UTF-8")
+      text  <- page %>% html_text2()
+      lines <- str_split(text, "\n")[[1]]
+      lines <- trimws(lines)
+      lines <- lines[nchar(lines) > 10]
+      
+      founding_lines <- lines[str_detect(
+        lines, "\\b(19[5-9]\\d|200\\d|201[0-5])\\b"
+      )]
+      
+      keyword_lines <- founding_lines[str_detect(
+        founding_lines,
+        regex("kuruluş|kuruldu|kurul tarihi|faaliyete geç|faaliyete başla|
+               hizmete girdi|yılından bu yana|dan bu yana|den bu yana",
+              ignore_case = TRUE)
+      )]
+      
+      if (length(keyword_lines) > 0) {
+        str_extract(keyword_lines[1], "\\b(19[5-9]\\d|200\\d|201[0-5])\\b")
+      } else if (length(founding_lines) > 0) {
+        years <- str_extract_all(
+          paste(founding_lines, collapse = " "),
+          "\\b(19[5-9]\\d|200\\d|201[0-5])\\b"
+        ) %>% unlist() %>% as.integer()
+        as.character(min(years))
+      } else {
+        NA
+      }
+      
+    }, error = function(e) NA)
+    
+    if (!is.na(result)) {
+      found_year <- result
+      found_url  <- url
+      break
+    }
+  }
+  
+  tibble(
+    website_url = base_url,
+    est_year    = found_year,
+    source_url  = found_url
+  )
+}
+
+# ---- RUN SCRAPER OR LOAD CACHE ----
+# Results cached after first run.
+osb_sf <- osb_sf %>%
+  mutate(website_url = paste0("https://", website))
+
+if (file.exists("osb_sf_scraped.rds")) {
+  
+  osb_sf <- readRDS("osb_sf_scraped.rds")
+  
+} else {
+  
+  # run in batches of 20 to avoid connection overflow
+  urls    <- osb_sf$website_url
+  batches <- split(urls, ceiling(seq_along(urls) / 20))
+  
+  year_results <- map_dfr(batches, function(batch) {
+    result <- map_dfr(batch, scrape_est_year)
+    Sys.sleep(5)
+    result
+  })
+  
+  # check coverage
+  year_results %>%
+    summarise(
+      hits  = sum(!is.na(est_year)),
+      total = n(),
+      pct   = round(hits / total * 100, 1)
+    ) %>% print()
+  
+  # merge years onto osb_sf
+  osb_sf <- osb_sf %>%
+    left_join(year_results, by = "website_url")
+  
+  saveRDS(osb_sf, "osb_sf_scraped.rds")
+}
+
+head(osb_sf)
+
+
+osb_clean <- osb_sf %>%
+  # step 1: spatial join to get district_id from turkey_district
+  st_join(turkey_district %>% select(district_id, province, district)) %>%
+  # step 2: fix est_year to integer
+  mutate(est_year = as.integer(est_year)) %>%
+  # step 3: drop unnecessary columns
+  select(
+    id,
+    zone_name,
+    province     = province.x,   # keep OSB province
+    district_id,
+    est_year,
+    dist_road_km,
+    website_url,
+    source_url,
+    geometry
+  )
+
+# check
+head(osb_clean)
+
+# how many have establishment years?
+osb_clean %>%
+  st_drop_geometry() %>%
+  summarise(
+    total        = n(),
+    has_year     = sum(!is.na(est_year)),
+    pct_coverage = round(has_year / total * 100, 1)
+  )
+
+# check year range — any implausible values?
+osb_clean %>%
+  st_drop_geometry() %>%
+  filter(!is.na(est_year)) %>%
+  summarise(
+    min_year = min(est_year),
+    max_year = max(est_year)
+  )
+
+# exclude implausible years — flag and remove from panel
+osb_clean <- osb_clean %>%
+  mutate(
+    est_year_clean = ifelse(est_year < 1961, NA, est_year),
+    year_flag = case_when(
+      est_year < 1961 ~ "excluded - predates first Turkish OSB",
+      TRUE            ~ "ok"
+    )
+  )
+
+# update zone_years with cleaned years
+zone_years <- osb_clean %>%
+  st_drop_geometry() %>%
+  filter(!is.na(est_year_clean)) %>%
+  group_by(district_id) %>%
+  summarise(est_year = min(est_year_clean, na.rm = TRUE), .groups = "drop")
+
+# one district may have multiple zones
+# take earliest establishment year per district
+zone_years <- osb_clean %>%
+  st_drop_geometry() %>%
+  filter(!is.na(est_year)) %>%
+  group_by(district_id) %>%
+  summarise(est_year = min(est_year, na.rm = TRUE), .groups = "drop")
+
+# merge onto adjacent analysis units
+analysis_units_adjacent <- analysis_units_adjacent %>%
+  left_join(zone_years, by = "district_id")
+
+# quick summary for memo — post 2012 zones
+osb_clean %>%
+  st_drop_geometry() %>%
+  filter(!is.na(est_year_clean)) %>%
+  mutate(viirs_coverage = est_year_clean >= 2012) %>%
+  count(viirs_coverage)
+
+
+library(fixest)
+
+# do zone districts have higher economic activity
+# conditional on road access?
+reg1 <- feols(mean_ntl_2025 ~ has_zone, 
+              data = analysis_units_adjacent)
+
+reg2 <- feols(mean_ntl_2025 ~ has_zone + dist_road_km, 
+              data = analysis_units_adjacent)
+
+reg3 <- feols(mean_ntl_2025 ~ has_zone + dist_road_km | province,
+              data = analysis_units_adjacent)
+
+etable(reg1, reg2, reg3)
+# apply fix_turkish to analysis_units_adjacent district names too
+analysis_units_adjacent <- analysis_units_adjacent %>%
+  filter(!is.na(district)) %>%
+  mutate(
+    province_join = fix_turkish(tolower(trimws(province))),
+    district_join = fix_turkish(tolower(trimws(district)))
+  )
+
+score_join <- score_clean %>%
+  mutate(
+    province_join = fix_turkish(tolower(trimws(province))),
+    district_join = fix_turkish(tolower(trimws(district)))
+  ) %>%
+  select(province_join, district_join, mean_score)
+
+# rejoin on cleaned keys
+analysis_units_adjacent <- analysis_units_adjacent %>%
+  select(-mean_score) %>%  # remove old failed merge
+  left_join(score_join, 
+            by = c("province_join", "district_join"))
+
+# check
+analysis_units_adjacent %>%
+  summarise(
+    n             = n(),
+    missing_score = sum(is.na(mean_score))
+  )
+
+reg_ses1 <- feols(mean_score ~ has_zone, 
+                  data = analysis_units_adjacent)
+
+reg_ses2 <- feols(mean_score ~ has_zone + dist_road_km, 
+                  data = analysis_units_adjacent)
+
+reg_ses3 <- feols(mean_score ~ has_zone + dist_road_km | province,
+                  data = analysis_units_adjacent,
+                  cluster = ~province)
+
+etable(reg_ses1, reg_ses2, reg_ses3)
+
+
+# night lights regressions
+reg_ntl1 <- feols(mean_ntl_2025 ~ has_zone, 
+                  data = analysis_units_adjacent)
+reg_ntl2 <- feols(mean_ntl_2025 ~ has_zone + dist_road_km, 
+                  data = analysis_units_adjacent)
+reg_ntl3 <- feols(mean_ntl_2025 ~ has_zone + dist_road_km + mean_score | province,
+                  data = analysis_units_adjacent,
+                  cluster = ~province)
+
+# two panel table
+cat("\n---- OUTCOME: NIGHT LIGHTS ----\n")
+etable(reg_ntl1, reg_ntl2, reg_ntl3)
+
+cat("\n---- OUTCOME: SES SCORE ----\n")
+etable(reg_ses1, reg_ses2, reg_ses3)
